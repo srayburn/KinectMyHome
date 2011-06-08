@@ -24,6 +24,8 @@
 #include <XnVSessionManager.h>
 #include "XnVMultiProcessFlowClient.h"
 #include <XnVWaveDetector.h>
+#include <XnVHandPointContext.h>
+#include <XnVCircleDetector.h>
 
 #include "kbhit.h"
 #include "signal_catch.h"
@@ -31,12 +33,25 @@
 // xml to initialize OpenNI
 #define SAMPLE_XML_FILE "Sample-Tracking.xml"
 XnBool g_bQuit = false;
+XnVCircleDetector*  g_pCircle = NULL;
+bool pd = false;
 
 //-----------------------------------------------------------------------------
 // Callbacks
 //-----------------------------------------------------------------------------
 
-// Callback for when the focus is in progress
+// Callback for when circle detected
+void XN_CALLBACK_TYPE CircleCB(XnFloat fTimes, XnBool bConfident, const XnVCircle* pCircle, void* pUserCxt)
+{
+	if (!pd){	
+		printf("Circle! Launching Pandora...\n");
+		//should add here some checks on volume...	
+	 
+		pd = true; 
+		system("/opt/Pandora/bin/Pandora &");
+	}
+}
+// Callback for when the focus is in pogress
 void XN_CALLBACK_TYPE SessionProgress(const XnChar* strFocus, const XnPoint3D& ptFocusPoint, XnFloat fProgress, void* UserCxt)
 {
 	printf("Session progress (%6.2f,%6.2f,%6.2f) - %6.2f [%s]\n", ptFocusPoint.X, ptFocusPoint.Y, ptFocusPoint.Z, fProgress,  strFocus);
@@ -55,7 +70,7 @@ void XN_CALLBACK_TYPE SessionEnd(void* UserCxt)
 void XN_CALLBACK_TYPE OnWaveCB(void* cxt)
 {
 
-         //printf("Wave!\n");
+         printf("Wave! Sending message to x10 controller...\n");
          system("~/kinect/bottlerocket-0.04c/br -N");
 }
 // callback for a new position of any hand
@@ -123,7 +138,10 @@ int main(int argc, char** argv)
 
 	// Start catching signals for quit indications
 	CatchSignals(&g_bQuit);
-
+	//init and register circle
+	g_pCircle = new XnVCircleDetector;
+	g_pCircle->RegisterCircle(NULL, &CircleCB);
+	pSessionGenerator->AddListener(g_pCircle);
 	// init & register wave control
 	XnVWaveDetector wc;
 	wc.RegisterWave(NULL, OnWaveCB);
