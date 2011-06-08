@@ -1,0 +1,23 @@
+KinectMyHome GSOC 2011 Project README
+
+FILE MANIFEST:
+
+kbhit.cpp -- from Nite1.3 Samples
+kbhit.h
+signal_catch.cpp -- from Nite1.3 Samples
+signal_catch.h
+main.cpp -- captures focus gesture (push) and waves to send command to bottlerocket x10 controller
+Default/KinectMyHome -- executable. Run with kinect plugged into usb port and power.
+Default/Sample-Tracking.xml -- initialization file from Nite Samples
+Default/Makefile -- make file
+
+Installation:
+
+Prerequisites: Nite1.3, OpenNI, PrimeSense sensor hacked for kinect, bottlerocket
+
+For installation details, see kinectmyhome.tumblr.com. Will be added here soon.
+
+clone git repo and change to dir
+cd Default
+make
+./KinectMyHome
